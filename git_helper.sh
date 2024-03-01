@@ -19,7 +19,7 @@ commit_changes() {
 
 # Function to revert to a specific commit
 revert_to_commit() {
-	commits=$(git log --pretty=format:'%h - %s' -10 | tr '\n' ' ')
+	commits=$(git log --pretty=format:'%h' -10 | tr '\n' ' ')
 	commit=$(zenity --list --title="Revert to Commit" --text="Choose a commit to revert to" --column "Commit" $commits)
 	if [ -n "$commit" ]; then
 		git revert --no-commit $commit..HEAD
