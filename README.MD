@@ -12,6 +12,7 @@ Git helper is a git helper (duh) made with bash using zenity.
 ### What can it do?
 
 - Push (with gui branch selection)
+- Pull (with gui branch selection)
 - Commit (with gui message input)
 - Revert (with gui branch selection)
 - Log

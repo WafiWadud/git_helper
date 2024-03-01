@@ -27,6 +27,15 @@ revert_to_commit() {
 	fi
 }
 
+# Function to pull from a remote repository
+pull_from_remote() {
+	remotes=$(git remote -v | awk '{print $1}' | uniq | tr '\n' ' ')
+	remote=$(zenity --list --title="Pull from Remote" --text="Choose a remote" --column "Remote" $remotes)
+	if [ -n "$remote" ]; then
+		git pull $remote
+	fi
+}
+
 # Function to show the log
 show_log() {
 	git log --oneline | zenity --text-info --title="Git Log"
@@ -34,9 +43,10 @@ show_log() {
 
 # Main loop to display the main menu
 while true; do
-	action=$(zenity --question --title="Git Helper" --switch --text="Choose an action" --extra-button="Push" --extra-button="Commit" --extra-button="Revert" --extra-button="Log" --extra-button="Exit")
+	action=$(zenity --question --title="Git Helper" --switch --text="Choose an action" --extra-button="Push" --extra-button="Pull" --extra-button="Commit" --extra-button="Revert" --extra-button="Log" --extra-button="Exit")
 	case $action in
 	"Push") push_to_remote ;;
+	"Pull") pull_from_remote ;;
 	"Commit") commit_changes ;;
 	"Revert") revert_to_commit ;;
 	"Log") show_log ;;
