@@ -34,7 +34,7 @@ show_log() {
 
 # Main loop to display the main menu
 while true; do
-	action=$(zenity --question --title="Git Helper" --text="Choose an action" --extra-button="Push" --extra-button="Commit" --extra-button="Revert" --extra-button="Log" --extra-button="Exit")
+	action=$(zenity --question --title="Git Helper" --switch --text="Choose an action" --extra-button="Push" --extra-button="Commit" --extra-button="Revert" --extra-button="Log" --extra-button="Exit")
 	case $action in
 	"Push") push_to_remote ;;
 	"Commit") commit_changes ;;
