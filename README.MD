@@ -15,6 +15,9 @@ Git helper is a git helper (duh) made with bash using zenity.
 - Pull (with gui branch selection)
 - Commit (with gui message input)
 - Revert (with gui branch selection)
+- Remote (with gui remote selection)
+- Merge (with gui branch selection)
+- Stash (with gui for stash saving and applying)
 - Log
 
 #### How to install?
