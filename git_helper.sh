@@ -7,6 +7,11 @@ push_to_remote() {
 	branch=$(git rev-parse --abbrev-ref HEAD)
 	if [ -n "$remote" ]; then
 		git push $remote $branch
+		if [ $? -eq 0 ]; then
+			zenity --info --text="Push to $remote successful."
+		else
+			zenity --error --text="Push to $remote failed."
+		fi
 	fi
 }
 
@@ -15,6 +20,11 @@ commit_changes() {
 	message=$(zenity --entry --title="Commit Message" --text="Enter your commit message")
 	git add .
 	git commit -m "$message"
+	if [ $? -eq 0 ]; then
+		zenity --info --text="Commit successful."
+	else
+		zenity --error --text="Commit failed."
+	fi
 }
 
 # Function to revert to a specific commit
@@ -24,6 +34,11 @@ revert_to_commit() {
 	if [ -n "$commit" ]; then
 		git revert --no-commit $commit..HEAD
 		git commit
+		if [ $? -eq 0 ]; then
+			zenity --info --text="Revert to $commit successful."
+		else
+			zenity --error --text="Revert to $commit failed."
+		fi
 	fi
 }
 
@@ -33,6 +48,11 @@ pull_from_remote() {
 	remote=$(zenity --list --title="Pull from Remote" --text="Choose a remote" --column "Remote" $remotes)
 	if [ -n "$remote" ]; then
 		git pull $remote
+		if [ $? -eq 0 ]; then
+			zenity --info --text="Pull from $remote successful."
+		else
+			zenity --error --text="Pull from $remote failed."
+		fi
 	fi
 }
 
@@ -43,14 +63,16 @@ add_remote_repository() {
 		--add-entry="Remote Name" \
 		--add-entry="Remote URL")
 
-	# Extract the remote name and URL values
 	remote_name=$(awk -F'|' '{print $1}' <<<$RETURNVALUE)
 	remote_url=$(awk -F'|' '{print $2}' <<<$RETURNVALUE)
 
-	# Check if both values are provided
 	if [ -n "$remote_name" ] && [ -n "$remote_url" ]; then
 		git remote add $remote_name $remote_url
-		zenity --info --text="Remote repository $remote_name added successfully."
+		if [ $? -eq 0 ]; then
+			zenity --info --text="Remote repository $remote_name added successfully."
+		else
+			zenity --error --text="Failed to add remote repository $remote_name."
+		fi
 	else
 		zenity --error --text="Please provide both a remote name and a URL."
 	fi
@@ -62,6 +84,11 @@ merge_branch() {
 	branch=$(zenity --list --title="Merge Branch" --text="Choose a branch to merge" --column "Branch" $branches)
 	if [ -n "$branch" ]; then
 		git merge $branch
+		if [ $? -eq 0 ]; then
+			zenity --info --text="Merge from $branch successful."
+		else
+			zenity --error --text="Merge from $branch failed."
+		fi
 	fi
 }
 
@@ -72,14 +99,22 @@ stash_changes() {
 		case $action in
 		"Stash")
 			git stash save "$(zenity --entry --title="Stash Message" --text="Enter your stash message")"
-			zenity --info --text="Changes stashed successfully."
+			if [ $? -eq 0 ]; then
+				zenity --info --text="Changes stashed successfully."
+			else
+				zenity --error --text="Failed to stash changes."
+			fi
 			;;
 		"Apply Stash")
 			stashes=$(git stash list | awk '{print $1}' | tr '\n' ' ')
 			stash=$(zenity --list --title="Apply Stash" --text="Choose a stash to apply" --column "Stash" $stashes)
 			if [ -n "$stash" ]; then
 				git stash apply $stash
-				zenity --info --text="Stash $stash applied successfully."
+				if [ $? -eq 0 ]; then
+					zenity --info --text="Stash $stash applied successfully."
+				else
+					zenity --error --text="Failed to apply stash $stash."
+				fi
 			fi
 			;;
 		"Exit") break ;;
@@ -88,19 +123,45 @@ stash_changes() {
 	done
 }
 
+# Function to restore changes to the last commit
+restore_to_last_commit() {
+	git restore .
+	if [ $? -eq 0 ]; then
+		zenity --info --text="Working directory restored to the last commit."
+	else
+		zenity --error --text="Failed to restore to the last commit."
+	fi
+}
+
+# Function to rebase a branch
+rebase_branch() {
+	branches=$(git branch --format "%(refname:short)" | tr '\n' ' ')
+	branch=$(zenity --list --title="Rebase Branch" --text="Choose a branch to rebase onto" --column "Branch" $branches)
+	if [ -n "$branch" ]; then
+		git rebase $branch
+		if [ $? -eq 0 ]; then
+			zenity --info --text="Rebase successful."
+		else
+			zenity --error --text="Rebase failed."
+		fi
+	fi
+}
+
 # Function to show the log
 show_log() {
 	git log --oneline | zenity --text-info --title="Git Log"
+	zenity --info --text="Git log displayed successfully."
 }
 
 # Main loop to display the main menu
 while true; do
-	action=$(zenity --question --title="Git Helper" --switch --text="Choose an action" --extra-button="Push" --extra-button="Pull" --extra-button="Commit" --extra-button="Revert" --extra-button="Remote" --extra-button="Merge" --extra-button="Stash" --extra-button="Log" --extra-button="Exit")
+	action=$(zenity --question --title="Git Helper" --switch --text="Choose an action" --extra-button="Push" --extra-button="Pull" --extra-button="Commit" --extra-button="Revert" --extra-button="Restore" --extra-button="Remote" --extra-button="Merge" --extra-button="Stash" --extra-button="Log" --extra-button="Exit")
 	case $action in
 	"Push") push_to_remote ;;
 	"Pull") pull_from_remote ;;
 	"Commit") commit_changes ;;
 	"Revert") revert_to_commit ;;
+	"Restore") restore_to_last_commit ;;
 	"Remote") add_remote_repository ;;
 	"Merge") merge_branch ;;
 	"Stash") stash_changes ;;
