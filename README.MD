@@ -1,3 +1,5 @@
+> [!WARNING]
+> The project is now feature complete and will receive no further updates. it is now in maintainence mode. PRs and issues are welcome.
 # Git helper
 Git helper is a git helper (duh) made with bash using zenity.
 
