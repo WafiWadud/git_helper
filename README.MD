@@ -24,7 +24,7 @@ Git helper is a git helper (duh) made with bash using zenity.
 - Stash (with gui for stash saving and applying)
 - Log
 
-> [!INFO]
+> [!NOTE]
 > This project assumes that you have your github key stored in your ~/.git-credentials if you do not then you will be asked to enter it in your terminal also this project doesn't work if you have the vi command set to anything.
 #### How to install?
 1. install zenity
